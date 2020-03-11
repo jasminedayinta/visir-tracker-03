@@ -1,7 +1,7 @@
-# Practical Assignment 1
+# Practical Assignment 3
 Please put your name (or names if you work in a group) here:  
 **Name**: .......
-## Problem 1.1
+## Problem 3.1
 ### Calculate Frames-per-Second (FPS) (Points 30)
 1. Fork the current repository
 2. Study the new framework-code of 
@@ -11,7 +11,7 @@ Please put your name (or names if you work in a group) here:
 ### Note
 MacOS users may need to launch the application with administrator right, to grant access to the web-camera.
 
-## Problem 1.2
+## Problem 3.2
 ### Face detection (Points 70)
 1. Read the OpenCV documentation about Viola-Jones face detector: [Cascade Classifier](https://docs.opencv.org/4.2.0/db/d28/tutorial_cascade_classifier.html)  
 2. Implement face detection for the video strem from the web-camera using the ```cv::CascadeClassifier``` class.
