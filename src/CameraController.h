@@ -18,9 +18,8 @@ private:
 	std::deque<Mat> 	m_vFrameBuffer;
 	std::mutex			m_mtx_FrameBuffer;
 
-	size_t				m_counter_in = 0;
-	size_t				m_counter_out = 0;
-
+	size_t				m_inFrameCounter = 0;
+	size_t				m_outFrameCounter = 0;
 	size_t				pointer_in = 0;
 	size_t				pointer_out = 0;
 	

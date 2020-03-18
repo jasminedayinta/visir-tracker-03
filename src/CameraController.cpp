@@ -14,34 +14,39 @@ void CCameraCantroller::start()
 	m_thr_producer = std::thread([&]() {
 		Mat img;
 		for (;;) {
-
+			// ------ MODIFY CODE HERE -------
 			m_mtx_FrameBuffer.lock();			
-			m_camera >> m_vFrameBuffer[pointer_in];
-			pointer_in = (pointer_in + 1) % m_vFrameBuffer.size();
+			m_camera >> m_vFrameBuffer[pointer_in % m_vFrameBuffer.size()];
+			pointer_in++;
 			m_mtx_FrameBuffer.unlock();
-			m_counter_in++;
+			m_inFrameCounter++;
 
-			std::this_thread::sleep_for(std::chrono::milliseconds(5));
+			std::this_thread::sleep_for(std::chrono::milliseconds(1));
 
 			if (m_terminate_producer) break;
 		}
 	});
 
+	const double tickFrequency = getTickFrequency();
 	m_terminate_counter = false;
-	m_thr_counter = std::thread([&]() {
+	m_thr_counter = std::thread([&, tickFrequency]() {
 		for (;;) {
+			static int64 ticks_old	= getTickCount();
+			int64 ticks_new 		= getTickCount();
+			double sec = (ticks_new - ticks_old) / tickFrequency;
+			ticks_old = ticks_new;
 			
-			// TODO: use precise time imterval instead of 1			
-			static size_t frames_in = 0;
-			float fps_in = static_cast<float>(m_counter_in - frames_in) / 1.0f;
-			frames_in = m_counter_in;
-
-			static size_t frames_out = 0;
-			float fps_out = static_cast<float>(m_counter_out - frames_out) / 1.0f;
-			frames_out = m_counter_out;
-
-
-			printf("FPS: in: %.2f | out: %.2f\n", fps_in, fps_out);
+			static int64 in_fps_old = m_inFrameCounter;
+			int64 in_fps_new 		= m_inFrameCounter;
+			int64 in_fps = in_fps_new - in_fps_old;
+			in_fps_old = in_fps_new;
+			
+			static int64 out_fps_old = m_outFrameCounter;
+			int64 out_fps_new 		 = m_outFrameCounter;
+			int64 out_fps = out_fps_new - out_fps_old;
+			out_fps_old = out_fps_new;
+			
+			printf("FPS: in: %.2f | out: %.2f\n", in_fps / sec, out_fps / sec);
 
 			std::this_thread::sleep_for(std::chrono::seconds(1));
 			if (m_terminate_counter) break;
@@ -52,16 +57,17 @@ void CCameraCantroller::start()
 Mat CCameraCantroller::getFrame()
 {
 	Mat res;
-	while (m_vFrameBuffer.empty())
-		std::this_thread::sleep_for(std::chrono::milliseconds(10));
-
-	// ------ PUT YOUR CODE HERE -------
-	m_mtx_FrameBuffer.lock();
-	if (!m_vFrameBuffer.empty()) {
-		res = m_vFrameBuffer.front();
+	if (pointer_out != pointer_in) {
+	
+		// ------ MODIFY CODE HERE -------
+		m_mtx_FrameBuffer.lock();
+		if (!m_vFrameBuffer.empty()) {
+			res = m_vFrameBuffer[pointer_out % m_vFrameBuffer.size()];
+			pointer_out++;
+		}
+		m_mtx_FrameBuffer.unlock();
 	}
-	m_mtx_FrameBuffer.unlock();
-	m_counter_out++;
+	m_outFrameCounter++;
 	return res;
 }
 
