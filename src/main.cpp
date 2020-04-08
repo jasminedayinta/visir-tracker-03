@@ -138,7 +138,7 @@ std::vector<Point2f> calcOpticalFlow(Mat old_gray, Mat frame_gray, std::vector<P
     // calculate optical flow
     calcOpticalFlowPyrLK(old_gray, frame_gray, p0, p1, status, err, Size(15,15), 2, criteria);
     
-    for(uint i = 0; i < p0.size(); i++)
+    for(int i = 0; i < p0.size(); i++)
     {
         // Select good points
         if(status[i] == 1) {
@@ -151,8 +151,8 @@ std::vector<Point2f> calcOpticalFlow(Mat old_gray, Mat frame_gray, std::vector<P
 
 //Feature Extraction from Assignment 2
 vector<Point2f> featureExtraction(Mat frame){
-    Mat frame;
-    cvtColor(img, frame, COLOR_BGR2GRAY); // Convert to grayscale
+    Mat img_frame;
+    cvtColor(frame, img_frame, COLOR_BGR2GRAY); // Convert to grayscale
     std::vector<Point2f> corners;
 
     goodFeaturesToTrack(frame, corners, 200, 0.01, 10,
@@ -163,8 +163,8 @@ vector<Point2f> featureExtraction(Mat frame){
 
 //Modified from featureExtraction using markFaces
 std::vector<Point2f> faceArea(Mat frame, std::vector<ptr_face_t> vpFaces) {
-    Mat frame;
-    cvtColor(img, frame, COLOR_BGR2GRAY); // Convert to grayscale
+    Mat img_frame;
+    cvtColor(frane, img_frame, COLOR_BGR2GRAY); // Convert to grayscale
     std::vector<Point2f> corners;
     std::vector<Point2f> detectCorners;
     
