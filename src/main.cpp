@@ -115,7 +115,7 @@ std::vector<ptr_face_t> faceDetector( Mat frame ){
     
     //CFace objects
     for (int i = 0; i < faces.size(); i++){
-        std::shared_ptr<CFace> face (new CFace(faces[i], i, ""));
+        std::shared_ptr<CFace> face (new CFace(face));
         ptr_CFace.push_back(std::move(face))
     }
     
