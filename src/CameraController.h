@@ -9,14 +9,14 @@ public:
 
     void    init(void);
     void    start(void);
-    Mat        getFrame(void);
+    Mat     getFrame(void);
     void    stop(void);
 
 
 private:
     VideoCapture        m_camera;
     std::deque<Mat>     m_vFrameBuffer;
-    std::mutex            m_mtx_FrameBuffer;
+    std::mutex          m_mtx_FrameBuffer;
 
     size_t                m_inFrameCounter = 0;
     size_t                m_outFrameCounter = 0;

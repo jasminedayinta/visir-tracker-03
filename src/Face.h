@@ -20,12 +20,12 @@ public:
     // Getters
     int            getID(void) const { return m_id; }
     std::string    getText(void) const { return m_text; }
-    Rect        getArea(void) const { return m_area; }
+    Rect           getArea(void) const { return m_area; }
 
 
 private:
     int             m_id;
-    std::string        m_text;
+    std::string     m_text;
     Rect            m_area;
 };
 

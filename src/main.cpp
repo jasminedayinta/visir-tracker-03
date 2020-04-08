@@ -9,10 +9,13 @@
 #include "opencv2/video.hpp"
 
 /**Function headers*/
-
 std::vector<ptr_face_t> faceDetector(Mat frame);
-std::vector<Point2f> faceArea(Mat frame, std::vector<ptr_face_t> vpFaces);
+std::vector<Point2f> calcOpticalFlow(Mat old_gray, Mat frame_gray, std::vector<Point2f> p0);
 std::vector<Point2f> featureExtraction(Mat frame);
+std::vector<Point2f> faceArea(Mat frame, std::vector<ptr_face_t> vpFaces);
+
+/**Global variables*/
+CascadeClassifier face_cascade;
 
 int main(int argc, const char** argv) {
     
@@ -39,8 +42,11 @@ int main(int argc, const char** argv) {
     // Main loop
     Mat img, mask;
     float attenuation = 0.5f;
-    int f = 0;
-    std::vector<Point2f> p0, p1, p2;
+    int f = 0; //frame count
+    
+    Mat old_gray, current_gray;
+    std::vector<Point2f> p0, p1;
+    
     for(;;) {
         img = controller.getFrame();
 
@@ -56,14 +62,29 @@ int main(int argc, const char** argv) {
             //Problem 3.3 Number 4
             if (f == 1 && f % 10 == 0){
                 vPoints = faceArea(img, vpFaces);
+                p0 = vPoints;
+                cvtColor(img, old_gray, COLOR_BGR2GRAY);
+            } else {
+                //update the previous frame and points
+                old_gray = current_gray.clone()
+                p0 = p1;
             }
             
             // ------ PUT YOUR CODE HERE -------
-            // vPoints = good features to track ()
-            CMarker::markPoints(mask, vPoints);
-            // { hFlow, vFlow } = calculate optical flow (vPoints)
-            // CMarker::markVecOFF(mask, hFlow, vFlow);
             
+            if(f % 2 == 0){
+                cvtColor(img, current_gray, COLOR_BGR2GRAY);
+                p1 = calcOpticalFlow(old_gray, current_gray, p0);
+                
+                for(int i = 0; i < p1.size(); i++){
+                    CMarker::markVecOFF(mask, img, p1[i], p0[i]);
+                    add(img, mask, img);
+                }
+            }
+            
+            // vPoints = good features to track ()
+            //CMarker::markPoints(mask, vPoints);
+            // { hFlow, vFlow } = calculate optical flow (vPoints)
             CMarker::markGUI(mask);
             
 
@@ -86,11 +107,11 @@ std::vector<ptr_face_t> faceDetector( Mat frame ){
     Mat frame_gray;
     cvtColor( frame, frame_gray, COLOR_BGR2GRAY );
     equalizeHist( frame_gray, frame_gray );
-   
+    std::vector<ptr_face_t> ptr_CFace;
+
     //-- Detect faces
     std::vector<Rect> faces;
     face_cascade.detectMultiScale( frame_gray, faces );
-    std::vector<ptr_face_t> ptr_CFace;
     
     //CFace objects
     for (int i = 0; i < faces.size(); i++){
@@ -101,7 +122,7 @@ std::vector<ptr_face_t> faceDetector( Mat frame ){
     return ptr_CFace;
     
      //-- Show what you got
-    imshow( "Capture - Face detection", frame );
+    //imshow( "Capture - Face detection", frame );
 }
 
 //Problem 3.3 Number 1, modified from Assignment 2
@@ -129,10 +150,10 @@ std::vector<Point2f> calcOpticalFlow(Mat old_gray, Mat frame_gray, std::vector<P
 }
 
 //Feature Extraction from Assignment 2
-vector<Point2f> featureExtraction(Mat img){
+vector<Point2f> featureExtraction(Mat frame){
     Mat frame;
     cvtColor(img, frame, COLOR_BGR2GRAY); // Convert to grayscale
-    vector<Point2f> corners;
+    std::vector<Point2f> corners;
 
     goodFeaturesToTrack(frame, corners, 200, 0.01, 10,
                         Mat(), 3, false, 0.04);
@@ -140,6 +161,24 @@ vector<Point2f> featureExtraction(Mat img){
     return corners;
 }
 
+//Modified from featureExtraction using markFaces
 std::vector<Point2f> faceArea(Mat frame, std::vector<ptr_face_t> vpFaces) {
+    Mat frame;
+    cvtColor(img, frame, COLOR_BGR2GRAY); // Convert to grayscale
+    std::vector<Point2f> corners;
+    std::vector<Point2f> detectCorners;
     
+    for (auto face : vpFaces){
+        Mat frame_gray(frame(face->getArea()));
+        
+        goodFeaturesToTrack(frame_gray, detectCorners, 200, 0.01, 10,
+        Mat(), 3, false, 0.04);
+        
+        for(int i = 0; i < detectCorners.size(); i++){
+            detectCorners[i].x += face->getArea().x;
+            detectCorners[i].y += face->getArea().y;
+        }
+    }
+    
+    return corners;
 }

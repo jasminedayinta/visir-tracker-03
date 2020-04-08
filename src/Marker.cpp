@@ -12,7 +12,7 @@ void CMarker::markFaces(Mat& img, const std::vector<ptr_face_t>& vFaces)
         Rect area = face->getArea();
         std::string text = face->getText();
         int id = face->getId();
-        std::string ID = std::to_string(id); //converting int id into string because it is a text
+        std::string ID = std::to_string(id);
         
         Point center( area.x + area.width/2, area.y + area.height/2 );
         Point top( area.x , area.y);
@@ -29,11 +29,11 @@ void CMarker::markPoints(Mat& img, const std::vector<Point2f>& vPoints, Scalar c
 }
 
 //Problem 3.3 Number 2
-void CMarker::markVecOFF(Mat& img, const Mat& hFlow, const Mat& vFlow)
+void CMarker::markVecOFF(Mat& img, Mat& circ, Point2f p0, Point2f p1)
 {
     // ------ PUT YOUR CODE HERE -------
-    line(img, oldCorner, newCorner, (255,255,255), 3);
-    circle(circ, newCorner, 5, (255,200,0), 1)
+    line(img, p0, p1, Scalar(255,255,255), 3);
+    circle(circ, p0, 5, Scalar(255,200,0), 1)
 }
 
 void CMarker::markGUI(Mat& img)
