@@ -107,7 +107,7 @@ std::vector<ptr_face_t> faceDetector( Mat frame ){
     Mat frame_gray;
     cvtColor( frame, frame_gray, COLOR_BGR2GRAY );
     equalizeHist( frame_gray, frame_gray );
-    std::vector<ptr_face_t> ptr_CFace;
+    std::vector<ptr_face_t> c_face;
 
     //-- Detect faces
     std::vector<Rect> faces;
@@ -116,10 +116,10 @@ std::vector<ptr_face_t> faceDetector( Mat frame ){
     //CFace objects
     for (int i = 0; i < faces.size(); i++){
         std::shared_ptr<CFace> face (new CFace(face));
-        ptr_CFace.push_back(std::move(face))
+        c_face.push_back(std::move(face))
     }
     
-    return ptr_CFace;
+    return c_face;
     
      //-- Show what you got
     //imshow( "Capture - Face detection", frame );
